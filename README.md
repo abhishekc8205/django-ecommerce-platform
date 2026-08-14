@@ -1,189 +1,330 @@
-# 🛒 Django E-Commerce Platform
+# 🔐 Admin
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-4.x-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
-[![DRF](https://img.shields.io/badge/Django%20REST%20Framework-3.x-red?logo=django&logoColor=white)](https://www.django-rest-framework.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-A role-based e-commerce application featuring distinct **Buyer** and **Seller** workflows, RESTful APIs, and full administrative capabilities built using **Python, Django, Django REST Framework, and PostgreSQL/SQLite**.
-
----
-
-## 📌 Table of Contents
-
-- [Features](#-features)
-  - [Buyer Capabilities](#buyer)
-  - [Seller Capabilities](#seller)
-  - [Admin & API](#admin--api)
-- [Tech Stack](#%EF%B8%8F-tech-stack)
-- [User Workflows](#-user-workflows)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Admin Access & Demo Credentials](#-admin-access--demo-credentials)
-- [Running Tests](#-running-tests)
-- [Project Goals](#-project-goals)
-- [Author](#-author)
+* Django Admin Panel
+* Manage users
+* Manage products
+* Manage orders
+* Manage reviews and application data
+* Full administrative access through Django Admin
 
 ---
 
-## ✨ Features
+## 🔗 REST API
 
-### 🛍️ Buyer
-* **Account Management:** User registration and secure login.
-* **Product Discovery:** Browse catalog and inspect detailed product specifications.
-* **Cart System:** Add items, modify quantities, and remove products seamlessly.
-* **Order Processing:** Place orders and track comprehensive order history.
-* **Feedback:** Submit reviews and ratings for purchased products.
+The project uses **Django REST Framework** to provide RESTful APIs.
 
-### 🏪 Seller
-* **Seller Dashboard:** High-level overview of listed items and incoming orders.
-* **Product Catalog Control:** Full CRUD functionality (Add, Edit, Update, Delete) for inventory.
-* **Order Management:** View and update fulfillment statuses for buyer orders.
+API functionality includes:
 
-### ⚙️ Admin & API
-* **Django Admin Integration:** Complete backend user and system data control.
-* **RESTful Architecture:** Clean REST API endpoints built with **Django REST Framework (DRF)**.
-* **Access Control:** Role-Based Access Control (RBAC) securing endpoints based on user permissions.
+* Product APIs
+* Category APIs
+* Authentication APIs
+* CRUD operations
+* Role-based permissions
+* JWT authentication
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
-| Category | Technology |
-| :--- | :--- |
-| **Language** | Python |
-| **Backend Framework** | Django, Django REST Framework (DRF) |
-| **Database** | SQLite (Development) / PostgreSQL (Production) |
-| **Frontend UI** | HTML5, CSS3, Bootstrap |
-| **Version Control** | Git & GitHub |
+| Category                 | Technology            |
+| ------------------------ | --------------------- |
+| **Programming Language** | Python                |
+| **Backend Framework**    | Django                |
+| **API Framework**        | Django REST Framework |
+| **Authentication**       | JWT                   |
+| **Database**             | SQLite / PostgreSQL   |
+| **Frontend**             | HTML, CSS, Bootstrap  |
+| **Version Control**      | Git & GitHub          |
 
 ---
 
-## 🔄 User Workflows
+# 🔄 User Workflows
 
-### 🛍️ Buyer Flow
+## 🛍️ Buyer Flow
+
 ```text
-Register/Login
-      │
-      ▼
-Browse Products ──► View Details
-      │
-      ▼
- Add to Cart
-      │
-      ▼
- Place Order ──► View Order History ──► Add Product Review
+Register / Login
+       │
+       ▼
+Browse Products
+       │
+       ▼
+View Product Details
+       │
+       ▼
+Add to Cart
+       │
+       ▼
+Checkout
+       │
+       ▼
+Place Order
+       │
+       ▼
+View Order History
+       │
+       ▼
+Add Product Review
 ```
 
-### 🏪 Seller Flow
+## 🏪 Seller Flow
+
 ```text
 Login as Seller
-      │
-      ▼
+       │
+       ▼
 Seller Dashboard
-      │
- ┌────┴────────────────────────┐
- ▼                             ▼
-Manage Inventory           Manage Orders
-(Add / Edit / Delete)    (View & Update Status)
+       │
+       ├───────────────┐
+       ▼               ▼
+Manage Products    Manage Orders
+       │               │
+       ▼               ▼
+Add / Edit /       View / Update
+Delete Products    Order Status
 ```
 
----
-
-## 📁 Project Structure
+# 📁 Project Structure
 
 ```text
 django-ecommerce-platform/
 │
 ├── manage.py
 ├── requirements.txt
-├── run_project.bat          # Automated Windows setup script
+├── run_project.bat
 ├── README.md
 │
-├── core/                    # Core project configuration & settings
-├── apps/                    # Django apps (accounts, products, orders, cart, api)
-├── templates/               # HTML templates
-├── static/                  # CSS, JS, and UI assets
-├── media/                   # User-uploaded product images
-└── database/                # SQLite DB (local dev)
+├── core/                 # Django project configuration
+├── apps/                 # Application modules
+│
+├── templates/            # HTML templates
+├── static/               # CSS, JavaScript and static assets
+├── media/                # Uploaded product images
+│
+└── database/             # Local database/sample data
 ```
 
----
+The exact application modules may vary depending on the project implementation.
 
-## 🚀 Getting Started
+# 🚀 Getting Started
 
-An automated Windows batch script (`run_project.bat`) is included to set up the virtual environment, install dependencies, run migrations, seed demo accounts, and launch the dev server automatically.
+The project includes a Windows batch file called `run_project.bat` that automates the local development setup.
 
-### 1. Clone the Repository
+## Prerequisites
+
+Make sure the following are installed:
+
+* Windows
+* Python 3.10 or higher
+* Git
+
+The project uses a Python virtual environment, which is automatically created by the setup script.
+
+## 1. Clone the Repository
+
 ```bash
 git clone https://github.com/abhishekc8205/django-ecommerce-platform.git
+```
+
+Move into the project directory:
+
+```bash
 cd django-ecommerce-platform
 ```
 
-### 2. Run Automated Setup
+## 2. Run the Automated Setup
 
-**Option A: Windows Command Prompt / File Explorer**
-> Double-click `run_project.bat`
+### Option A — File Explorer
 
-**Option B: Windows PowerShell**
+Double-click:
+
+```text
+run_project.bat
+```
+
+### Option B — PowerShell
+
+Run:
+
 ```powershell
 .\run_project.bat
 ```
 
-> **What `run_project.bat` does under the hood:**
-> 1. Creates virtual environment (`venv`)
-> 2. Activates the virtual environment
-> 3. Installs `requirements.txt`
-> 4. Applies database migrations (`python manage.py migrate`)
-> 5. Creates demo admin superuser
-> 6. Launches local development server
+The script automatically performs the following steps:
 
-### 3. Access the Application
-
-Once started, open your browser at:
 ```text
-http://127.0.0.1:8000/
+Create virtual environment
+        ↓
+Activate virtual environment
+        ↓
+Install dependencies
+        ↓
+Run database migrations
+        ↓
+Create admin superuser
+        ↓
+Start Django development server
 ```
 
----
+No manual virtual environment setup is required.
 
-## 🔐 Admin Access & Demo Credentials
+## 3. Open the Application
 
-An administrator account is pre-configured for demonstration and testing purposes.
+Once the server starts, open:
 
-| Field | Credential |
-| :--- | :--- |
-| **Admin Panel URL** | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) |
-| **Username** | `admin` |
-| **Email** | `admin@gmail.com` |
-| **Password** | `12345` |
+http://127.0.0.1:8000/
 
-> ⚠️ **Note:** These default credentials are strictly for demonstration and development purposes. Do **not** use default credentials in production settings.
+# 🔐 Admin Access
 
----
+The setup script automatically creates the admin account if it does not already exist.
 
-## 🧪 Running Tests
+## Demo Credentials
 
-Execute the automated test suite via Django's test runner:
+| Field     | Value                        |
+| --------- | ---------------------------- |
+| Admin URL | http://127.0.0.1:8000/admin/ |
+| Username  | `admin`                      |
+| Email     | `admin@gmail.com`            |
+| Password  | `12345`                      |
+
+Open the admin panel:
+
+http://127.0.0.1:8000/admin/
+
+Then log in using the credentials above.
+
+> ⚠️ **Note:** These credentials are intended only for local development, demonstrations, and interviews. Do not use them in a production environment.
+
+# 🧪 Testing
+
+Run the Django test suite using:
 
 ```bash
 python manage.py test
 ```
 
----
+Django will automatically discover and execute the project's test cases.
 
-## 🎯 Project Purpose
+# ⚙️ Useful Django Commands
 
-This project highlights end-to-end backend and full-stack implementation including:
-- Clean RESTful API design using DRF.
-- Explicit database schema structuring and ORM query optimization.
-- Custom authentication flows and Role-Based Access Control (RBAC).
-- Modular Django architecture and maintainable project organization.
+If you need to work with the project manually:
 
----
+### Create migrations
 
-## 👨‍💻 Author
+```bash
+python manage.py makemigrations
+```
+
+### Apply migrations
+
+```bash
+python manage.py migrate
+```
+
+### Create a superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+### Run the development server
+
+```bash
+python manage.py runserver
+```
+
+# 🔒 Environment Variables
+
+Sensitive configuration should be stored in environment variables rather than committed to Git.
+
+Use the provided environment template if available:
+
+```text
+.env.template
+```
+
+Create your local `.env` file and add the required configuration.
+
+`.env` files should not be committed to GitHub.
+
+# 🎯 Project Purpose
+
+This project demonstrates practical backend development using Django and Django REST Framework.
+
+Key concepts demonstrated:
+
+* Django application architecture
+* REST API development
+* CRUD operations
+* Django ORM
+* Database relationships
+* Authentication
+* JWT authentication
+* Role-Based Access Control (RBAC)
+* Product management
+* Shopping cart functionality
+* Order processing
+* Review and rating functionality
+* Django Admin
+* Git and GitHub
+
+# 💡 Interview Highlights
+
+The project can be used to demonstrate knowledge of:
+
+## Backend
+
+* Django
+* Django REST Framework
+* RESTful API design
+* Django ORM
+* Authentication and authorization
+* Role-based permissions
+
+## Database
+
+* Relational database design
+* Django models
+* Foreign keys
+* Database migrations
+* CRUD operations
+
+## Development
+
+* Virtual environments
+* Dependency management
+* Environment variables
+* Git version control
+* Automated local setup using a Windows batch script
+
+# 👨‍💻 Author
 
 **Abhishek Chikhale**
-* GitHub: [@abhishekc8205](https://github.com/abhishekc8205)
+
+GitHub: `@abhishekc8205`
+
+# ⭐ Project Repository
+
+`django-ecommerce-platform`
+
+---
+
+# One Thing Before You Push
+
+Your **BAT file needs to actually contain the superuser creation command** if the README says it creates the admin automatically.
+
+The relevant section should be:
+
+```bat
+echo.
+echo Running database migrations...
+python manage.py migrate
+
+echo.
+echo Creating admin superuser if it does not exist...
+python manage.py shell -c "from django.contrib.auth import get_user_model; User=get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin','admin@gmail.com','12345')"
+
+echo.
+echo Starting Django server...
+python manage.py runserver 0.0.0.0:8000
+```
