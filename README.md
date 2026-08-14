@@ -1,11 +1,71 @@
-# 🔐 Admin
+# 🛒 Django E-Commerce Platform
 
-* Django Admin Panel
-* Manage users
-* Manage products
-* Manage orders
-* Manage reviews and application data
-* Full administrative access through Django Admin
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-4.x-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Django REST Framework](https://img.shields.io/badge/Django%20REST%20Framework-3.x-red?logo=django&logoColor=white)](https://www.django-rest-framework.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+A role-based e-commerce application built with **Python, Django, and Django REST Framework (DRF)**.
+
+The application provides separate **Buyer and Seller workflows**, product management, shopping cart functionality, order processing, product reviews, authentication, role-based access control, REST APIs, and Django administration.
+
+---
+
+## 📌 Table of Contents
+
+- [Features](#-features)
+  - [Buyer](#-buyer)
+  - [Seller](#-seller)
+  - [Admin](#-admin)
+  - [REST API](#-rest-api)
+- [Tech Stack](#️-tech-stack)
+- [User Workflows](#-user-workflows)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Admin Access](#-admin-access)
+- [Testing](#-testing)
+- [Project Purpose](#-project-purpose)
+- [Author](#-author)
+
+---
+
+# ✨ Features
+
+## 🛍️ Buyer
+
+- User registration and login
+- Browse available products
+- View product details
+- Add products to cart
+- Update cart quantities
+- Remove products from cart
+- Place orders
+- View order history
+- Submit product reviews and ratings
+
+---
+
+## 🏪 Seller
+
+- Seller dashboard
+- Add new products
+- Edit existing products
+- Delete products
+- Manage product inventory
+- View customer orders
+- Update order status
+
+---
+
+## 🔐 Admin
+
+- Django Admin Panel
+- Manage users
+- Manage products
+- Manage orders
+- Manage reviews and application data
+- Full administrative access through Django Admin
 
 ---
 
@@ -15,26 +75,26 @@ The project uses **Django REST Framework** to provide RESTful APIs.
 
 API functionality includes:
 
-* Product APIs
-* Category APIs
-* Authentication APIs
-* CRUD operations
-* Role-based permissions
-* JWT authentication
+- Product APIs
+- Category APIs
+- Authentication APIs
+- CRUD operations
+- Role-based permissions
+- JWT authentication
 
 ---
 
 # 🛠️ Tech Stack
 
-| Category                 | Technology            |
-| ------------------------ | --------------------- |
-| **Programming Language** | Python                |
-| **Backend Framework**    | Django                |
-| **API Framework**        | Django REST Framework |
-| **Authentication**       | JWT                   |
-| **Database**             | SQLite / PostgreSQL   |
-| **Frontend**             | HTML, CSS, Bootstrap  |
-| **Version Control**      | Git & GitHub          |
+| Category | Technology |
+|---|---|
+| **Programming Language** | Python |
+| **Backend Framework** | Django |
+| **API Framework** | Django REST Framework |
+| **Authentication** | JWT |
+| **Database** | SQLite / PostgreSQL |
+| **Frontend** | HTML, CSS, Bootstrap |
+| **Version Control** | Git & GitHub |
 
 ---
 
@@ -65,7 +125,6 @@ View Order History
        │
        ▼
 Add Product Review
-```
 
 ## 🏪 Seller Flow
 
