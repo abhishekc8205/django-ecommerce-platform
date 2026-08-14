@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Add Product{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-8 text-white">
+      <h1 class="text-3xl font-semibold">Add New Product</h1>
+      <p class="mt-2 text-indigo-100 max-w-2xl">Create a new item for your catalog with image, category, price, stock and description.</p>
+    </div>
+    <div class="px-8 py-10 sm:px-10">
+      <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div>
+            <label for="id_category" class="mb-2 block text-sm font-medium text-gray-700">Category</label>
+            {{ form.category }}
+          </div>
+
+          <div>
+            <label for="id_title" class="mb-2 block text-sm font-medium text-gray-700">Product name</label>
+            {{ form.title }}
+          </div>
+        </div>
+
+        <div>
+          <label for="id_image" class="mb-2 block text-sm font-medium text-gray-700">Product image</label>
+          {{ form.image }}
+        </div>
+
+        <div>
+          <label for="id_description" class="mb-2 block text-sm font-medium text-gray-700">Description</label>
+          {{ form.description }}
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div>
+            <label for="id_price" class="mb-2 block text-sm font-medium text-gray-700">Price</label>
+            <div class="relative rounded-lg border border-gray-300 bg-white shadow-sm focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200">
+              {{ form.price }}
+              <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">USD</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="id_stock" class="mb-2 block text-sm font-medium text-gray-700">Stock quantity</label>
+            {{ form.stock }}
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 pt-2">
+          <a href="{% url 'index' %}" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Back to shop</a>
+          <button type="submit" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200/40 transition hover:bg-indigo-700">Save product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

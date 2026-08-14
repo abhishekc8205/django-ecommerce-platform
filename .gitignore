@@ -1,0 +1,12 @@
+.env
+.env.local
+.env.*.local
+
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Keep these in GitHub:
+# db.sqlite3
+# store/media/

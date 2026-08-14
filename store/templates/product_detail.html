@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.title }} - Cartify{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- Back link to the catalog. Helpful breadcrumb-style navigation. -->
+    <a href="{% url 'index' %}" class="text-sm text-indigo-600 hover:underline">
+        &larr; Back to catalog
+    </a>
+
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+
+        <!-- LEFT: Product image. Reuses the existing product.image field. -->
+        <div>
+            {% if product.image %}
+                <!-- Show the main product image at a fixed height, kept inside the card. -->
+                <img src="{{ product.image.url }}" alt="{{ product.title }}"
+                     class="w-full h-96 object-contain rounded-xl bg-gray-50">
+            {% else %}
+                <!-- Placeholder shown when no image has been uploaded. -->
+                <div class="flex items-center justify-center h-96 w-full bg-gray-50 text-gray-400 rounded-xl">
+                    <i class="fa-solid fa-image text-6xl"></i>
+                </div>
+            {% endif %}
+
+            <!-- ==================================================================
+                 GALLERY (NEW FEATURE - multi-image gallery)
+                 ------------------------------------------------------------------
+                 Below the main image we show all extra ProductImage rows for
+                 this product. We display the caption under each thumbnail.
+                 Each thumbnail has a delete button that only the owner sees.
+                 ================================================================== -->
+            {% if gallery_images %}
+                <h2 class="mt-8 text-lg font-bold text-gray-900">Gallery</h2>
+                <div class="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {% for img in gallery_images %}
+                        <div class="relative group">
+                            <!-- The thumbnail itself. -->
+                            <img src="{{ img.image.url }}" alt="{{ img.caption|default:product.title }}"
+                                 class="w-full h-24 object-cover rounded-lg border border-gray-200">
+
+                            <!-- Caption (only shown if the seller typed one). -->
+                            {% if img.caption %}
+                                <p class="mt-1 text-xs text-gray-500 truncate">{{ img.caption }}</p>
+                            {% endif %}
+
+                            <!-- Owner-only delete button. Hidden by default and
+                                 shown on hover (group-hover) for a clean look. -->
+                            {% if can_manage_product %}
+                                <form method="post"
+                                      action="{% url 'delete_product_image' img.id %}"
+                                      class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onsubmit="return confirm('Delete this image?');">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="inline-flex items-center justify-center w-7 h-7
+                                                   rounded-full bg-red-600 text-white text-xs
+                                                   hover:bg-red-700">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Owner-only: button to upload a new gallery image. -->
+            {% if can_manage_product %}
+                <a href="{% url 'add_product_image' product.id %}"
+                   class="mt-4 inline-flex items-center justify-center px-4 py-2
+                          rounded-lg bg-gray-100 text-gray-700 font-medium
+                          hover:bg-gray-200 transition-colors">
+                    <i class="fa-solid fa-upload mr-2"></i> Add gallery image
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT: Title, description, price, variants, add-to-cart. -->
+        <div class="flex flex-col">
+
+            <!-- Category badge. Comes from the existing Category ForeignKey. -->
+            <p class="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-1">
+                {{ product.category.name }}
+            </p>
+
+            <!-- Product title. -->
+            <h1 class="text-3xl font-extrabold text-gray-900">{{ product.title }}</h1>
+
+            <!-- Description. default filter shows a friendly message if empty. -->
+            <p class="mt-4 text-gray-600 leading-relaxed">
+                {{ product.description|default:"No description available." }}
+            </p>
+
+            <div class="mt-6 flex flex-wrap items-center gap-3">
+                <p class="text-2xl font-extrabold text-gray-900">${{ product.price }}</p>
+                {% if product.stock > 0 %}
+                    <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-700">In stock</span>
+                {% else %}
+                    <span class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-700">Out of stock</span>
+                {% endif %}
+            </div>
+
+            <!-- VARIANT PICKER (NEW FEATURE) -----------------------------------
+                 We loop over all variants for this product. Each one becomes
+                 a clickable chip. The active chip gets the indigo highlight.
+                 The form below sends the chosen variant id to add_to_cart.
+                 If there are no variants, we just show a "Default" chip. -->
+            <form method="get" action="{% url 'add_to_cart' product.id %}" class="mt-8">
+
+                <p class="text-sm font-semibold text-gray-700 mb-2">Choose option:</p>
+
+                <div class="flex flex-wrap gap-2">
+                    {% if variants %}
+                        {% for v in variants %}
+                            <!-- A radio input disguised as a button. The label is
+                                 clickable; the radio stores the variant id. -->
+                            <label class="cursor-pointer">
+                                <input type="radio" name="variant" value="{{ v.id }}"
+                                       class="peer sr-only" {% if forloop.first %}checked{% endif %}>
+                                <span class="inline-block px-4 py-2 rounded-full border border-gray-300
+                                             text-sm text-gray-700
+                                             peer-checked:bg-indigo-600 peer-checked:text-white
+                                             peer-checked:border-indigo-600
+                                             hover:bg-gray-50">
+                                    {{ v.display_name }}
+                                </span>
+                            </label>
+                        {% endfor %}
+                    {% else %}
+                        <!-- No variants yet: fall back to the parent product. -->
+                        <span class="inline-block px-4 py-2 rounded-full border border-gray-300
+                                     text-sm text-gray-700">
+                            Default
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Add to cart button. The form action already points to
+                     add_to_cart and the chosen variant id travels as ?variant=. -->
+                {% if product.stock > 0 %}
+                <button type="submit"
+                        class="mt-8 inline-flex items-center justify-center px-6 py-3
+                               rounded-lg bg-indigo-600 text-white font-semibold
+                               hover:bg-indigo-700 transition-colors">
+                    <i class="fa-solid fa-cart-plus mr-2"></i> Add to cart
+                </button>
+                {% else %}
+                <button type="button" disabled class="mt-8 inline-flex cursor-not-allowed items-center justify-center px-6 py-3 rounded-lg bg-gray-200 text-gray-500 font-semibold">
+                    <i class="fa-solid fa-cart-plus mr-2"></i> Out of stock
+                </button>
+                {% endif %}
+            </form>
+
+            <!-- SELLER-ONLY: button to add a new variant. Permission check is
+                 already done in the view, so this only renders for owners. -->
+            {% if can_manage_product %}
+                <a href="{% url 'add_variant' product.id %}"
+                   class="mt-4 inline-flex items-center justify-center px-6 py-2
+                          rounded-lg bg-gray-100 text-gray-700 font-medium
+                          hover:bg-gray-200 transition-colors w-fit">
+                    <i class="fa-solid fa-plus mr-2"></i> Add new variant
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Existing variants list table (helpful for the seller to see stock). -->
+    {% if variants %}
+        <div class="mt-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">All options</h2>
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 border-b">
+                        <th class="py-2">Option</th>
+                        <th class="py-2">SKU</th>
+                        <th class="py-2">Price</th>
+                        <th class="py-2">Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in variants %}
+                        <tr class="border-b last:border-0">
+                            <td class="py-2">{{ v.display_name }}</td>
+                            <td class="py-2 text-gray-500">{{ v.sku|default:"-" }}</td>
+                            <td class="py-2">${{ v.get_price }}</td>
+                            <td class="py-2">
+                                {% if v.stock > 0 %}
+                                    <span class="text-green-600 font-semibold">{{ v.stock }} in stock</span>
+                                {% else %}
+                                    <span class="text-red-600 font-semibold">Out of stock</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <!-- ======================================================================
+         REVIEWS SECTION (NEW FEATURE)
+         ----------------------------------------------------------------------
+         Shows the average rating + count, then a list of all reviews.
+         Logged-in users can leave a review (or see "you already reviewed").
+         The author of a review (or a superuser) gets a small delete button.
+         ====================================================================== -->
+    <div class="mt-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-gray-900">Customer reviews</h2>
+                <!-- Average rating summary line. -->
+                <p class="mt-1 text-sm text-gray-600">
+                    <span class="font-semibold text-gray-900">
+                        {{ average_rating|floatformat:1 }} / 5
+                    </span>
+                    &middot; {{ review_count }} review{{ review_count|pluralize }}
+                </p>
+            </div>
+
+            <!-- "Leave a review" button - hidden if the user already has one. -->
+            {% if user.is_authenticated and not user_review %}
+                <a href="{% url 'add_review' product.id %}"
+                   class="inline-flex items-center justify-center px-5 py-2 rounded-lg
+                          bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors">
+                    <i class="fa-solid fa-pen mr-2"></i> Leave a review
+                </a>
+            {% elif user.is_authenticated and user_review %}
+                <span class="text-sm text-gray-500">You already reviewed this product.</span>
+            {% else %}
+                <!-- Anonymous visitors must log in first. -->
+                <a href="{% url 'login' %}"
+                   class="text-sm text-indigo-600 hover:underline">
+                    Log in to leave a review
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Loop through every review and render it as a simple card. -->
+        <div class="mt-6 space-y-4">
+            {% for review in reviews %}
+                <div class="border border-gray-100 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <!-- Stars row: solid stars for the rating, empty for the rest. -->
+                            <p class="text-yellow-500">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p class="mt-1 text-sm text-gray-700">
+                                <span class="font-semibold">
+                                    {{ review.user.username|default:"Anonymous" }}
+                                </span>
+                                {% if review.verified_purchase %}
+                                    <!-- Green badge for verified buyers. -->
+                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700">
+                                        <i class="fa-solid fa-circle-check mr-1"></i> Verified purchase
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Author / superuser can delete their own review. -->
+                        {% if user.is_authenticated and user == review.user or user.is_superuser %}
+                            <form method="post" action="{% url 'delete_review' review.id %}"
+                                  onsubmit="return confirm('Delete this review?');">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="text-xs text-red-600 hover:underline">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- The review comment itself, only shown if the user wrote one. -->
+                    {% if review.comment %}
+                        <p class="mt-3 text-sm text-gray-700">{{ review.comment }}</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <!-- Friendly fallback when there are no reviews yet. -->
+                <p class="text-sm text-gray-500">No reviews yet. Be the first to review!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

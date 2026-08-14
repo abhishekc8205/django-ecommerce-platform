@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Confirm delete{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto py-24 px-4">
+  <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+    <h2 class="text-2xl font-semibold mb-4">Delete "{{ object.title }}"?</h2>
+    <p class="text-sm text-gray-600 mb-6">This action cannot be undone.</p>
+    <form method="post">
+      {% csrf_token %}
+      <a href="{% url 'index' %}" class="inline-block mr-4 text-sm text-gray-600 hover:text-indigo-600">Cancel</a>
+      <button type="submit" class="inline-block bg-red-600 text-white px-4 py-2 rounded-lg">Delete</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

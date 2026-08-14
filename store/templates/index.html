@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}Welcome to Cartify{% endblock %}
+
+{% block content %}
+
+
+<!-- ==============================================================================
+     REAL-WORLD ANALOGY: The Store Shelves
+     ------------------------------------------------------------------------------
+     Imagine you walk past the storefront window (our hero section above) and step 
+     inside the store. You see neat rows of shelves displaying all the items for sale.
+     This section below acts exactly like those shelves! We loop through the 'products' 
+     box we received from the views.py warehouse, and for each item, we build a clean
+     display card so the customer can see it and buy it.
+     ============================================================================== -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Our Catalog</h2>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">Everything you need, right at your fingertips.</p>
+    </div>
+    <form method="get" action="{% url 'index' %}" class="mb-8 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-gray-700">Category</label>
+                <select name="category" class="w-full rounded-xl border border-gray-300 py-2.5 px-3 text-sm text-gray-700">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.slug }}" {% if category_slug == category.slug %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-gray-700">Sort</label>
+                <select name="sort" class="w-full rounded-xl border border-gray-300 py-2.5 px-3 text-sm text-gray-700">
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                </select>
+            </div>
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-gray-700">Min price</label>
+                <input type="number" min="0" step="0.01" name="min_price" value="{{ min_price }}" class="w-full rounded-xl border border-gray-300 py-2.5 px-3 text-sm text-gray-700" placeholder="0">
+            </div>
+            <div>
+                <label class="mb-2 block text-sm font-semibold text-gray-700">Max price</label>
+                <input type="number" min="0" step="0.01" name="max_price" value="{{ max_price }}" class="w-full rounded-xl border border-gray-300 py-2.5 px-3 text-sm text-gray-700" placeholder="1000">
+            </div>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-semibold hover:bg-indigo-700">
+                Apply filters
+            </button>
+            <a href="{% url 'index' %}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Clear</a>
+        </div>
+    </form>
+
+    <!-- We use a CSS Grid layout to automatically create responsive columns for our products.
+         On small phones, it's 1 column. On tablets (sm), 2 columns. On desktop (lg), 3 columns! -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-8">
+        
+        <!-- We use a Django template 'for' loop to iterate through every product we received -->
+        {% for product in products %}
+        <div class="group relative bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+            
+            <!-- Product Image Display -->
+            <div class="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden relative">
+                <!-- We check if the product has an image uploaded -->
+                {% if product.image %}
+                    <!-- If it does, we display it, stretching it to cover the space cleanly -->
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" class="object-contain w-full h-48 group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                    <!-- If there is no image, we show a clean placeholder icon -->
+                    <div class="flex items-center justify-center h-48 w-full bg-gray-50 text-gray-400">
+                        <i class="fa-solid fa-image text-4xl"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Product Details Container -->
+            <div class="mt-6 flex flex-col flex-grow">
+                <!-- Product Category Badge -->
+                <p class="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-1">{{ product.category.name }}</p>
+                
+                <!-- Product Title -->
+                <h3 class="text-lg font-bold text-gray-900 leading-tight">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <!-- We stretch a transparent link over the entire card so clicking anywhere on the card works! -->
+                        <span aria-hidden="true" class="absolute inset-0"></span>
+                        {{ product.title }}
+                    </a>
+                </h3>
+                
+                <!-- Product Description (Truncated using line-clamp so it doesn't break our clean layout) -->
+                <p class="mt-2 text-sm text-gray-500 line-clamp-2">
+                    {{ product.description|default:"No description available." }}
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                    <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">★ {{ product.average_rating|floatformat:1|default:"0.0" }}</span>
+                    {% if product.stock > 0 %}
+                        <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">In stock</span>
+                    {% else %}
+                        <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">Out of stock</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Price and Action Area (Pushed to the bottom using flex-grow on the details above) -->
+            <div class="mt-6 flex items-center justify-between border-t border-gray-100 pt-4 relative z-20">
+                <!-- Product Price formatted neatly -->
+                <p class="text-xl font-extrabold text-gray-900">${{ product.price }}</p>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Add to Cart Action -->
+                    {% if product.stock > 0 %}
+                        <a href="{% url 'add_to_cart' product.id %}" class="inline-flex items-center justify-center p-2 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 z-30 relative">
+                            <i class="fa-solid fa-cart-plus text-sm"></i>
+                        </a>
+                    {% else %}
+                        <span class="inline-flex items-center justify-center p-2 rounded-full bg-gray-100 text-gray-400" title="Out of stock">
+                            <i class="fa-solid fa-cart-plus text-sm"></i>
+                        </span>
+                    {% endif %}
+
+                    <!-- Owner-only actions: edit / delete -->
+                    {% if user.is_authenticated and user.is_seller %}
+                        {% if user == product.owner %}
+                            <a href="{% url 'edit_product' product.id %}" class="inline-flex items-center justify-center p-2 rounded-full bg-yellow-50 text-yellow-600 hover:bg-yellow-600 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-600 z-30 relative">
+                                <i class="fa-solid fa-pen-to-square text-sm"></i>
+                            </a>
+                            <form method="post" action="{% url 'delete_product' product.id %}" class="inline-block" onsubmit="return confirm('Delete this product?');">
+                                {% csrf_token %}
+                                <button type="submit" class="inline-flex items-center justify-center p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 z-30 relative">
+                                    <i class="fa-solid fa-trash text-sm"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- We provide an 'empty' fallback in case the warehouse (database) has 0 products inside it! -->
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 text-gray-400 mb-4">
+                <i class="fa-solid fa-box-open text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900">No products found</h3>
+            <p class="mt-1 text-sm text-gray-500">Check back later for new arrivals.</p>
+        </div>
+        {% endfor %}
+        
+    </div>
+</div>
+{% if is_paginated %}
+<div class="mt-8 flex justify-center">
+    <nav aria-label="Page navigation">
+        <ul class="inline-flex items-center -space-x-px rounded-md shadow-sm">
+            {% if page_obj.has_previous %}
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}" 
+                   class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700">
+                    <span class="sr-only">Previous</span>
+                    &#x25C0;
+                </a>
+            </li>
+            {% else %}
+            <li>
+                <span class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg cursor-not-allowed">
+                    <span class="sr-only">Previous</span>
+                    &#x25C0;
+                </span>
+            </li>
+            {% endif %}
+            
+            {# Page numbers: show current and a few around #}
+            {% for num in paginator.page_range %}
+                {% if num == page_obj.number %}
+                <li>
+                    <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}" 
+                       class="px-3 py-2 leading-tight text-indigo-600 bg-indigo-50 border border-transparent hover:bg-indigo-100 hover:text-indigo-700">
+                        {{ num }}
+                    </a>
+                </li>
+                {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                <li>
+                    <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}" 
+                       class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
+                        {{ num }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}" 
+                   class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">
+                    <span class="sr-only">Next</span>
+                    &#x25B6;
+                </a>
+            </li>
+            {% else %}
+            <li>
+                <span class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg cursor-not-allowed">
+                    <span class="sr-only">Next</span>
+                    &#x25B6;
+                </span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

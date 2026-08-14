@@ -1,0 +1,180 @@
+<!-- templates/checkout.html -->
+
+<!-- We inherit from our master layout blueprint so that we automatically get our header, navigation bar, and footer -->
+{% extends 'base.html' %}
+
+<!-- We define a custom title name for our checkout page including the unique 7-digit order number -->
+{% block title %}Checkout Order #{{ order.order_id }} - Cartify{% endblock %}
+
+<!-- We pour our checkout elements directly into our master layout content block -->
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    
+    <!-- Premium Checkout Header showing a breadcrumb trail and invoice details -->
+    <div class="mb-12 border-b border-gray-100 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <!-- Header Title -->
+            <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl flex items-center gap-3">
+                Checkout
+            </h1>
+            <p class="mt-2 text-sm text-gray-500 font-medium">
+                Review your order details and complete the mock payment.
+            </p>
+            <span class="mt-3 inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-700">
+                <i class="fa-solid fa-circle-info mr-2"></i> Status: {{ order.get_order_status_display }}
+            </span>
+        </div>
+        
+        <!-- Order ID badge that highlights the unique 7-digit numeric code -->
+        <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-2xl p-4 self-start md:self-auto shadow-sm">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div>
+                <span class="block text-[10px] text-indigo-500 font-bold uppercase tracking-wider">Order Reference</span>
+                <span class="block font-black text-indigo-900 text-lg">#{{ order.order_id }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two-column modern grid layout: Left is Order Items & Shipping details, Right is the Static Credit Card payment box -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- LEFT COLUMN: ORDER DETAILS & SHIPPING SUMMARY (Occupies 8 out of 12 grid spaces on large screens) -->
+        <div class="lg:col-span-8 space-y-8">
+            
+            <!-- 1. SHIPPING DETAILS SUMMARY CARD -->
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-6">
+                <!-- Shipping section heading with icon -->
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2.5 pb-4 border-b border-gray-100">
+                    <i class="fa-solid fa-truck-ramp-box text-indigo-600"></i> Shipping & Delivery Details
+                </h2>
+                
+                <!-- Two-item responsive detail grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Recipient detail field -->
+                    <div class="space-y-1">
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Recipient Name</span>
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-3.5">
+                            <i class="fa-solid fa-user text-gray-400 text-sm"></i>
+                            <span class="font-bold text-gray-800 text-sm">{{ order.full_name }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Destination Address detail field -->
+                    <div class="space-y-1">
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Destination Address</span>
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-3.5">
+                            <i class="fa-solid fa-location-dot text-gray-400 text-sm"></i>
+                            <span class="font-semibold text-gray-800 text-sm truncate" title="{{ order.address }}">{{ order.address }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ORDER ITEMS LIST CARD -->
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-6">
+                <!-- Header of itemized list -->
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2.5 pb-4 border-b border-gray-100">
+                    <i class="fa-solid fa-box-open text-indigo-600"></i> Order Items Snapshot
+                </h2>
+                
+                <div class="divide-y divide-gray-100">
+                    <!-- Loop through each frozen OrderItem inside our order object -->
+                    {% for item in order_items %}
+                        <!-- Row structure with items aligned nicely -->
+                        <div class="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            
+                            <!-- Product Image & Information Column -->
+                            <div class="flex items-center gap-4 self-start sm:self-auto">
+                                <!-- Image Frame with gray border -->
+                                <div class="w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center flex-shrink-0 p-1.5">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="object-contain max-w-full max-h-full">
+                                    {% else %}
+                                        <i class="fa-solid fa-image text-gray-300 text-lg"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <!-- Category indicator -->
+                                    <span class="text-[9px] font-bold text-indigo-600 uppercase tracking-widest block">{{ item.product.category.name }}</span>
+                                    <!-- Frozen snapshot product name -->
+                                    <h3 class="font-bold text-gray-900 text-sm leading-snug">{{ item.product.title }}</h3>
+                                    <!-- Locked-in price per unit annotation -->
+                                    <span class="text-xs text-gray-400 font-medium">Locked unit price: ${{ item.price }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Quantity & Subtotal breakdown -->
+                            <div class="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-end border-t border-gray-50 sm:border-t-0 pt-3 sm:pt-0">
+                                <!-- Quantity purchased display -->
+                                <div class="text-center sm:text-right">
+                                    <span class="block text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Quantity</span>
+                                    <span class="font-extrabold text-gray-800 text-sm bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">x{{ item.quantity }}</span>
+                                </div>
+                                
+                                <!-- Multiplied subtotal calculation -->
+                                <div class="text-right">
+                                    <span class="block text-[9px] text-indigo-500 font-bold uppercase tracking-widest">Subtotal</span>
+                                    <span class="font-black text-indigo-600 text-base">${{ item.subtotal }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: PREMIUM CREDIT CARD PAYMENT FORM (Occupies 4 out of 12 grid spaces on large screens) -->
+        <div class="lg:col-span-4">
+            
+            <!-- Sticky checkout action board -->
+            <div class="space-y-8 sticky top-24">
+                
+                
+
+                <!-- Static billing details card -->
+                <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-md space-y-6">
+                    <h3 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-green-500"></i> Payment Details
+                    </h3>
+                    
+                    <!-- Static simulated fields informing the user of the future integration -->
+                    <div class="space-y-4">
+                        <!-- Static breakdown of charges -->
+                        <div class="space-y-3 font-medium text-xs border-b border-gray-100 pb-4">
+                            <!-- Invoice Subtotal -->
+                            <div class="flex items-center justify-between text-gray-500">
+                                <span>Invoice Subtotal</span>
+                                <span class="text-gray-900 font-bold">${{ order.total_price }}</span>
+                            </div>
+                            <!-- Static transaction fee -->
+                            <div class="flex items-center justify-between text-gray-500">
+                                <span>Gateway Processing Fee</span>
+                                <span class="text-green-600 font-bold uppercase tracking-wider">Free</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Grand Total Price Block -->
+                        <div class="flex items-center justify-between text-sm py-1">
+                            <span class="text-gray-900 font-extrabold text-base">Grand Total Due</span>
+                            <span class="text-indigo-600 font-black text-xl">${{ order.total_price }}</span>
+                        </div>
+                    </div>
+
+                    {% if order.payment_method == 'stripe' %}
+                    <form action="{% url 'create_checkout_session' order.order_id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 relative overflow-hidden group">
+                            <i class="fa-solid fa-credit-card"></i> Pay Now with Stripe
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="p-4 bg-yellow-50 rounded">Payment method: Cash on Delivery. The order will be processed and paid on delivery.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

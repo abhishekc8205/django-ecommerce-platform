@@ -1,0 +1,134 @@
+<!-- templates/payment_status.html -->
+
+<!-- We inherit from our master layout blueprint so that we automatically get our header, navigation bar, and footer -->
+{% extends 'base.html' %}
+
+<!-- We define a custom title name for our payment status page dynamically based on success or failure -->
+{% block title %}
+    {% if status == 'success' %}
+        Payment Successful - Order #{{ order.order_id }} - Cartify
+    {% else %}
+        Payment Failed - Order #{{ order.order_id }} - Cartify
+    {% endif %}
+{% endblock %}
+
+<!-- We pour our payment status elements directly into our master layout content block -->
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    
+    <!-- Outer wrapper container, styled as a premium glassmorphic card with subtle shadows and rounded borders -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-8 md:p-12 shadow-xl space-y-10 text-center">
+        
+        <!-- Check if the payment status is success to render the gorgeous green confirmation board -->
+        {% if status == 'success' %}
+            
+            <!-- Success Status Icon Animation Group -->
+            <div class="flex flex-col items-center">
+                <!-- Outer pulsing success ring -->
+                <div class="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center border-4 border-green-100 shadow-md animate-pulse">
+                    <!-- Deep green check icon -->
+                    <i class="fa-solid fa-circle-check text-green-500 text-5xl"></i>
+                </div>
+                
+                <!-- Success Header Heading -->
+                <h1 class="mt-6 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Payment Successful!
+                </h1>
+                
+                <!-- Friendly success caption -->
+                <p class="mt-2 text-sm text-gray-500 font-semibold max-w-md">
+                    Thank you for your purchase! Your payment has been processed securely, and your order is officially confirmed.
+                </p>
+            </div>
+
+            <!-- Detailed order receipt block -->
+            <div class="bg-gray-50 border border-gray-100 rounded-2xl p-6 text-left space-y-4">
+                <!-- Receipt block header -->
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-widest flex items-center gap-1.5 border-b border-gray-200 pb-3">
+                    <i class="fa-solid fa-receipt"></i> Transaction Invoice Receipt
+                </h3>
+                
+                <!-- Detail items organized in simple rows -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-semibold">
+                    <!-- Order Reference field -->
+                    <div>
+                        <span class="block text-[10px] text-gray-400 uppercase tracking-wider">Order Reference</span>
+                        <span class="text-gray-800">#{{ order.order_id }}</span>
+                    </div>
+                    
+                    <!-- Grand Total field -->
+                    <div>
+                        <span class="block text-[10px] text-gray-400 uppercase tracking-wider">Total Amount Paid</span>
+                        <span class="text-indigo-600 font-extrabold text-base">${{ order.total_price }}</span>
+                    </div>
+
+                    <!-- Shipping Recipient Name field -->
+                    <div>
+                        <span class="block text-[10px] text-gray-400 uppercase tracking-wider">Shipping To</span>
+                        <span class="text-gray-800">{{ order.full_name }}</span>
+                    </div>
+
+                    <!-- Shipping Address field -->
+                    <div>
+                        <span class="block text-[10px] text-gray-400 uppercase tracking-wider">Delivery Address</span>
+                        <span class="text-gray-800 truncate block" title="{{ order.address }}">{{ order.address }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actionable success button triggers -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <!-- Back to Shopping action link -->
+                <a href="{% url 'index' %}" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl transition-all duration-200 shadow-md flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-cart-shopping"></i> Continue Shopping
+                </a>
+            </div>
+
+        <!-- Render the failed/canceled template block if status is not success -->
+        {% else %}
+            
+            <!-- Failure Status Icon Animation Group -->
+            <div class="flex flex-col items-center">
+                <!-- Outer pulsing red failure ring -->
+                <div class="w-24 h-24 rounded-full bg-red-50 flex items-center justify-center border-4 border-red-100 shadow-md">
+                    <!-- Deep red cross icon -->
+                    <i class="fa-solid fa-circle-xmark text-red-500 text-5xl"></i>
+                </div>
+                
+                <!-- Failure Header Heading -->
+                <h1 class="mt-6 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Payment Failed
+                </h1>
+                
+                <!-- Failure detail description -->
+                <p class="mt-2 text-sm text-gray-500 font-semibold max-w-md">
+                    We're sorry, but the payment transaction could not be processed. If you entered test card details on Stripe, make sure the card was approved.
+                </p>
+
+                <!-- Optional technical error message (for auditing / student reference) -->
+                {% if error %}
+                    <div class="mt-4 bg-red-50 border border-red-100 rounded-xl p-3 text-left w-full max-w-md">
+                        <span class="block text-[8px] font-bold text-red-400 uppercase tracking-wider">Technical Log</span>
+                        <span class="font-mono text-xs text-red-600 block leading-snug">{{ error }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Actionable failure button triggers -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <!-- Retry Payment dynamic action link pointing back to our checkout review screen -->
+                <a href="{% url 'checkout_page' order.order_id %}" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl transition-all duration-200 shadow-md flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-arrows-rotate"></i> Retry Checkout
+                </a>
+                
+                <!-- Direct Customer Help anchor -->
+                <a href="{% url 'index' %}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3.5 px-8 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-house"></i> Return Home
+                </a>
+            </div>
+
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock %}

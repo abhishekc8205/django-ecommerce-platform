@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Details #{{ order.order_id }} - Cartify{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    
+    <!-- Breadcrumb navigation to return home or back to dashboard easily -->
+    <nav class="flex mb-8 text-xs font-semibold uppercase tracking-wider" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1.5 md:space-x-2">
+            <!-- Dashboard link -->
+            <li class="inline-flex items-center">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center text-gray-500 hover:text-indigo-600 transition-colors gap-1.5">
+                    <i class="fa-solid fa-house text-[10px]"></i> Dashboard
+                </a>
+            </li>
+            <!-- Chevron spacer -->
+            <li>
+                <div class="flex items-center text-gray-400">
+                    <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                </div>
+            </li>
+            <!-- Active order tag -->
+            <li class="text-indigo-600 font-bold" aria-current="page">
+                Order #{{ order.order_id }}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Page Title Header block -->
+    <div class="mb-10 border-b border-gray-150 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="space-y-1">
+            <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-3">
+                Order Details
+            </h1>
+            <p class="text-xs text-gray-400 font-semibold tracking-wider uppercase">
+                Placed on {{ order.created_at|date:"F d, Y" }} at {{ order.created_at|date:"h:i A" }}
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-2xl p-4 self-start md:self-auto shadow-sm">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div>
+                <span class="block text-[10px] text-indigo-500 font-bold uppercase tracking-wider">Order Reference</span>
+                <span class="block font-black text-indigo-900 text-lg">#{{ order.order_id }}</span>
+                <span class="mt-1 inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-700">{{ order.get_order_status_display }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two-column modern grid layout: Left is Order Items & Shipping, Right is Payment status card -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- LEFT COLUMN: ORDER DETAILS & SHIPPING SUMMARY (Occupies 8 out of 12 grid spaces on large screens) -->
+        <div class="lg:col-span-8 space-y-8">
+            
+            <!-- 1. ORDER ITEMS ITEMIZATION SNAPSHOT -->
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-6">
+                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2.5 pb-4 border-b border-gray-100">
+                    <i class="fa-solid fa-box-open text-indigo-600"></i> Purchased Products
+                </h2>
+                
+                <div class="divide-y divide-gray-100">
+                    <!-- Loop through each OrderItem line snapshot belonging to the Order -->
+                    {% for item in order_items %}
+                        <!-- Row structure for each product item -->
+                        <div class="py-5 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            
+                            <!-- Left: image & title details -->
+                            <div class="flex items-center gap-4 w-full sm:w-auto">
+                                <!-- Image holder frame with gray border -->
+                                <div class="w-16 h-16 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center flex-shrink-0 p-1.5 shadow-sm">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="object-contain max-w-full max-h-full">
+                                    {% else %}
+                                        <i class="fa-solid fa-image text-gray-300 text-xl"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <!-- Dynamic product category banner -->
+                                    <span class="text-[9px] font-bold text-indigo-600 uppercase tracking-widest block">{{ item.product.category.name }}</span>
+                                    <!-- Snapshotted Title -->
+                                    <h3 class="font-extrabold text-gray-900 text-sm leading-snug">{{ item.product.title }}</h3>
+                                    <!-- Locked-in historical price alert -->
+                                    <span class="text-xs text-gray-400 font-semibold mt-0.5 block">Unit Price: ${{ item.price }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Right: Quantity & accumulated item totals -->
+                            <div class="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-end border-t border-gray-50 sm:border-t-0 pt-4 sm:pt-0">
+                                <!-- Purchase Quantity counter -->
+                                <div class="text-center sm:text-right">
+                                    <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider">Quantity</span>
+                                    <span class="font-extrabold text-gray-800 text-sm bg-gray-50 border border-gray-200 px-3.5 py-1 rounded-lg">x{{ item.quantity }}</span>
+                                </div>
+                                
+                                <!-- Individual item subtotal calculation (price * quantity) -->
+                                <div class="text-right">
+                                    <span class="block text-[9px] text-indigo-500 font-bold uppercase tracking-widest">Subtotal</span>
+                                    <span class="font-black text-indigo-600 text-base">
+                                        <!-- Calls the OrderItem subtotal property from models -->
+                                        ${{ item.subtotal }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 2. SHIPPING & DISPATCH CARD -->
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-6">
+                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2.5 pb-4 border-b border-gray-100">
+                    <i class="fa-solid fa-truck-ramp-box text-indigo-600"></i> Dispatch & Shipping Details
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Recipient shipping column -->
+                    <div class="space-y-1">
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Recipient Name</span>
+                        <div class="flex items-center gap-2.5 bg-gray-50 border border-gray-150 rounded-xl p-3.5">
+                            <i class="fa-solid fa-user text-gray-400 text-sm"></i>
+                            <span class="font-extrabold text-gray-850 text-sm">{{ order.full_name }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery home address column -->
+                    <div class="space-y-1">
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Shipping Address</span>
+                        <div class="flex items-center gap-2.5 bg-gray-50 border border-gray-150 rounded-xl p-3.5">
+                            <i class="fa-solid fa-location-dot text-gray-400 text-sm animate-bounce"></i>
+                            <span class="font-bold text-gray-850 text-sm truncate" title="{{ order.address }}">{{ order.address }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: BILLING & PAYMENT STATUS OVERVIEW (Occupies 4 out of 12 grid spaces on large screens) -->
+        <div class="lg:col-span-4">
+            
+            <div class="space-y-8 sticky top-24">
+                
+                <!-- Billing Receipt Summary board -->
+                <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-md space-y-6">
+                    <h3 class="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-indigo-600"></i> Invoice Summary
+                    </h3>
+                    
+                    <!-- Cost Breakdowns -->
+                    <div class="space-y-4">
+                        <div class="space-y-3 font-semibold text-xs border-b border-gray-100 pb-4">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <span>Subtotal</span>
+                                <span class="text-gray-900 font-bold">${{ order.total_price }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-gray-500">
+                                <span>Shipping Fees</span>
+                                <span class="text-green-600 uppercase tracking-wider text-[10px] font-bold">Free</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Grand Total Price Block -->
+                        <div class="flex items-center justify-between text-sm py-1">
+                            <span class="text-gray-900 font-extrabold text-base">Grand Total</span>
+                            <span class="text-indigo-600 font-black text-xl">${{ order.total_price }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Gate Status Card -->
+                    <div class="p-4 rounded-2xl border text-center space-y-2 mt-2 {% if order.is_paid %}bg-green-50 border-green-150 text-green-800{% else %}bg-amber-50 border-amber-150 text-amber-800{% endif %}">
+                        <div class="flex items-center justify-center gap-2">
+                            {% if order.is_paid %}
+                                <i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
+                                <span class="font-extrabold text-sm uppercase tracking-wider">Invoice Fully Paid</span>
+                            {% else %}
+                                <i class="fa-solid fa-circle-exclamation text-amber-500 text-lg"></i>
+                                <span class="font-extrabold text-sm uppercase tracking-wider">Awaiting Payment</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if order.is_paid %}
+                            <p class="text-[10px] text-green-600 font-medium">
+                                Transaction processed securely. Your items are being prepared for shipping logistics.
+                            </p>
+                        {% else %}
+                            <p class="text-[10px] text-amber-600 font-medium">
+                                This order remains pending.
+                                {% if order.payment_method == 'stripe' %} Click the payment link below to complete checkout using Stripe.{% else %} Payment method: Cash on Delivery.{% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Conditional Action Button depending on payment status -->
+                    <div class="space-y-3">
+                        {% if order.is_paid %}
+                            <!-- Back to Dashboard secondary action -->
+                            <a href="{% url 'dashboard' %}" class="w-full inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-sm text-sm">
+                                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                        {% else %}
+                            {% if order.payment_method == 'stripe' %}
+                            <form action="{% url 'create_checkout_session' order.order_id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 relative overflow-hidden group">
+                                    <i class="fa-solid fa-credit-card"></i> Pay Now with Stripe
+                                </button>
+                            </form>
+                            {% else %}
+                            <div class="p-3 text-sm bg-yellow-50 rounded">Payment method: Cash on Delivery. No online payment required.</div>
+                            {% endif %}
+                            <a href="{% url 'dashboard' %}" class="w-full inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 text-xs border border-gray-150">
+                                <i class="fa-solid fa-chevron-left"></i> Back
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
