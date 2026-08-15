@@ -12,15 +12,18 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import importlib.util
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%^@5%ui$7qda5r*^u_@++r=@zfmjtw(f0)5n+)2tii+m+d!046'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-development-only-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -146,8 +149,6 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
 }
-
-import os # Standard Python module to interact with environment variables
 
 # Stripe Publishable Key: Safe to share with the frontend browser templates
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder_key_here')
