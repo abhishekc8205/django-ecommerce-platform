@@ -1,7 +1,7 @@
 """Views for product listing and browsing."""
 from django.shortcuts import render
 from django.db.models import Q, Avg, Case, IntegerField, Value, When
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.paginator import Paginator
 
 from store.models import Product, Category
 
@@ -59,12 +59,7 @@ def index_view(request):
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
 
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'products': page_obj,

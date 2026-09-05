@@ -40,14 +40,11 @@ def add_to_cart(request, product_id):
 
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
-    if variant:
-        cart_item, item_created = CartItem.objects.get_or_create(
-            cart=cart, product=product, variant=variant
-        )
-    else:
-        cart_item, item_created = CartItem.objects.get_or_create(
-            cart=cart, product=product, variant__isnull=True
-        )
+    cart_item, item_created = CartItem.objects.get_or_create(
+        cart=cart,
+        product=product,
+        variant=variant,
+    )
 
     if not item_created:
         if cart_item.quantity + 1 > stock_available:
